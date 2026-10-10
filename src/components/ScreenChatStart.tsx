@@ -20,7 +20,7 @@ export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWri
 
   const start = (value = text) => {
     const clean = value.trim();
-    if (clean) onStart(clean, 'listen');
+    if (clean) onStart(clean, 'understand');
   };
 
   return (

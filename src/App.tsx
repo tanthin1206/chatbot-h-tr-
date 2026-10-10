@@ -44,7 +44,7 @@ export const App: React.FC = () => {
   const analysisController = useRef<AbortController | null>(null);
   const chatController = useRef<AbortController | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [supportMode, setSupportMode] = useState<SupportMode>('listen');
+  const [supportMode, setSupportMode] = useState<SupportMode>('understand');
   const [isChatTyping, setIsChatTyping] = useState(false);
 
   // Trạng thái phiên làm việc hiện tại
