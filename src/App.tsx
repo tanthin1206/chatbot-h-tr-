@@ -46,6 +46,7 @@ export const App: React.FC = () => {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [supportMode, setSupportMode] = useState<SupportMode>('understand');
   const [isChatTyping, setIsChatTyping] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
 
   // Trạng thái phiên làm việc hiện tại
   const [session, setSession] = useState<SessionState>({
@@ -220,6 +221,7 @@ export const App: React.FC = () => {
     setChatMessages(nextMessages);
     setCurrentScreen('screen-chat-conversation');
     setIsChatTyping(true);
+    setChatError(null);
     chatController.current?.abort();
     const controller = new AbortController();
     chatController.current = controller;
@@ -240,7 +242,10 @@ export const App: React.FC = () => {
         response
       }]);
     } catch (error) {
-      if (!controller.signal.aborted) console.error('Lỗi trò chuyện:', error);
+      if (!controller.signal.aborted) {
+        console.error('Lỗi trò chuyện:', error);
+        setChatError(error instanceof Error ? error.message : 'Mây chưa thể kết nối Gemini. Bạn thử gửi lại nhé.');
+      }
     } finally {
       if (!controller.signal.aborted) setIsChatTyping(false);
     }
@@ -318,6 +323,7 @@ export const App: React.FC = () => {
             messages={chatMessages}
             supportMode={supportMode}
             isTyping={isChatTyping}
+            error={chatError}
             onModeChange={setSupportMode}
             onSend={(text) => sendChatMessage(text)}
             onFinish={summarizeConversation}

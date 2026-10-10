@@ -6,6 +6,7 @@ interface ScreenChatConversationProps {
   messages: ChatMessage[];
   supportMode: SupportMode;
   isTyping: boolean;
+  error: string | null;
   onModeChange: (mode: SupportMode) => void;
   onSend: (text: string) => void;
   onFinish: () => void;
@@ -24,6 +25,7 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
   messages,
   supportMode,
   isTyping,
+  error,
   onModeChange,
   onSend,
   onFinish,
@@ -108,6 +110,12 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
             <div className="rounded-2xl rounded-tl-md bg-blue-50 border border-blue-100 px-4 py-3 flex gap-1">
               {[0, 1, 2].map((item) => <span key={item} className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: `${item * 120}ms` }} />)}
             </div>
+          </div>
+        )}
+
+        {error && (
+          <div role="alert" className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+            {error} Tin nhắn của bạn vẫn ở phía trên; bạn có thể gửi lại khi sẵn sàng.
           </div>
         )}
       </div>
