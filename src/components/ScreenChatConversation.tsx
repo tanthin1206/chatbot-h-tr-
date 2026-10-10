@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ArrowUp, CheckCircle2, FileHeart, HeartHandshake, Lightbulb, MessageCircle, MessagesSquare, ShieldAlert, Sparkles } from 'lucide-react';
 import { ChatMessage, SupportMode } from '../types';
 
@@ -133,26 +134,29 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
         </div>
       )}
 
-      <div className="fixed bottom-3 left-1/2 z-50 flex w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 items-end gap-2 rounded-2xl border border-stone-200 bg-[#FAF8F5]/95 p-2 shadow-xl shadow-slate-900/15 backdrop-blur-md" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
-        <textarea
-          value={text}
-          onChange={(event) => setText(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              send();
-            }
-          }}
-          disabled={isTyping}
-          maxLength={2000}
-          rows={2}
-          placeholder="Bạn muốn kể thêm điều gì?"
-          className="flex-1 resize-none bg-transparent px-2 py-2 text-sm focus:outline-none disabled:opacity-60"
-        />
-        <button onClick={() => send()} disabled={!text.trim() || isTyping} aria-label="Gửi tin nhắn" className="w-10 h-10 rounded-xl bg-blue-600 disabled:bg-stone-200 text-white flex items-center justify-center shrink-0">
-          <ArrowUp className="w-5 h-5" />
-        </button>
-      </div>
+      {createPortal(
+        <div className="fixed bottom-3 left-1/2 z-[100] flex w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 items-end gap-2 rounded-2xl border border-stone-200 bg-[#FAF8F5]/95 p-2 shadow-xl shadow-slate-900/15 backdrop-blur-md" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
+          <textarea
+            value={text}
+            onChange={(event) => setText(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                send();
+              }
+            }}
+            disabled={isTyping}
+            maxLength={2000}
+            rows={2}
+            placeholder="Bạn muốn kể thêm điều gì?"
+            className="flex-1 resize-none bg-transparent px-2 py-2 text-sm focus:outline-none disabled:opacity-60"
+          />
+          <button onClick={() => send()} disabled={!text.trim() || isTyping} aria-label="Gửi tin nhắn" className="w-10 h-10 rounded-xl bg-blue-600 disabled:bg-stone-200 text-white flex items-center justify-center shrink-0">
+            <ArrowUp className="w-5 h-5" />
+          </button>
+        </div>,
+        document.body
+      )}
 
       <div className="text-center">
         <button onClick={onOpenSafety} className="text-[11px] text-rose-600 hover:underline inline-flex items-center gap-1"><ShieldAlert className="w-3.5 h-3.5" /> Mình đang không an toàn</button>
