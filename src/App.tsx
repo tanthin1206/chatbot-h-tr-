@@ -268,9 +268,7 @@ export const App: React.FC = () => {
       <Header
         currentScreen={currentScreen}
         onNavigate={setCurrentScreen}
-        onEmergencyExit={handleEmergencyExit}
         onOpenDrafts={() => setIsDraftsOpen(true)}
-        onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenSafety={() => setCurrentScreen('screen-safety')}
       />
 

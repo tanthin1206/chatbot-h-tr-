@@ -1,22 +1,18 @@
 import React from 'react';
-import { Wind, ShieldAlert, BookOpen, Settings, Trash2 } from 'lucide-react';
+import { Wind, ShieldAlert, BookOpen } from 'lucide-react';
 import { Screen } from '../types';
 
 interface HeaderProps {
   currentScreen: Screen;
   onNavigate: (screen: Screen) => void;
-  onEmergencyExit: () => void;
   onOpenDrafts: () => void;
-  onOpenSettings: () => void;
   onOpenSafety: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentScreen,
   onNavigate,
-  onEmergencyExit,
   onOpenDrafts,
-  onOpenSettings,
   onOpenSafety
 }) => {
   // Bản đồ tiến trình tinh tế theo spec: Cảm xúc → Chia sẻ → Nhìn lại → Hành động
@@ -100,26 +96,6 @@ export const Header: React.FC<HeaderProps> = ({
             <BookOpen className="w-4 h-4" />
           </button>
 
-          {/* Cài đặt / API Key */}
-          <button
-            onClick={onOpenSettings}
-            className="p-2 rounded-lg text-slate-600 hover:bg-stone-200/60 transition-colors"
-            title="Cài đặt AI & Riêng tư"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {/* Nút Thoát khẩn cấp (Xóa phiên ngay lập tức) */}
-          {showProgress && (
-            <button
-              onClick={onEmergencyExit}
-              className="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition-colors"
-              title="Xóa phiên ngay và thoát ra"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-slate-400 hover:text-rose-500" />
-              <span className="hidden sm:inline">Xóa phiên</span>
-            </button>
-          )}
         </div>
       </div>
     </header>
