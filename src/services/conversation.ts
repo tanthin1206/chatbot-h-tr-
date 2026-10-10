@@ -53,11 +53,30 @@ export async function continueConversation(
     });
     const payload = await httpResponse.json().catch(() => null);
     if (httpResponse.ok && payload?.response) return payload as ConversationReply;
+    throw new Error(getGeminiErrorMessage(httpResponse.status, payload?.error));
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') throw error;
+    if (error instanceof Error && error.message !== 'Failed to fetch') throw error;
   }
 
-  throw new Error('Không thể nhận phản hồi từ Gemini. Kiểm tra API key hoặc thử lại sau ít phút.');
+  throw new Error('Không thể kết nối Gemini. Hãy kiểm tra mạng hoặc thử lại sau ít phút.');
+}
+
+function getGeminiErrorMessage(status: number, errorCode?: string): string {
+  if (errorCode === 'gemini_not_configured') {
+    return 'Gemini chưa được cấu hình trên Vercel. Hãy thêm biến GEMINI_API_KEY rồi Redeploy dự án.';
+  }
+  const messages: Record<number, string> = {
+    400: 'Yêu cầu tới Gemini bị từ chối. Hãy kiểm tra API key hoặc cấu hình model.',
+    401: 'API key Gemini không hợp lệ hoặc đã bị thu hồi.',
+    403: 'API key không có quyền dùng Gemini API hoặc bị giới hạn tên miền.',
+    404: `Không tìm thấy model ${CLIENT_GEMINI_MODEL} cho API key này.`,
+    429: 'Gemini đang hết quota hoặc bị giới hạn tần suất. Hãy thử lại sau ít phút.',
+    500: 'Gemini đang gặp lỗi máy chủ. Hãy thử lại sau ít phút.',
+    502: 'Gemini chưa tạo được phản hồi hợp lệ. Hãy thử gửi lại.',
+    503: 'Gemini tạm thời chưa sẵn sàng. Hãy thử lại sau ít phút.'
+  };
+  return messages[status] || `Không thể kết nối Gemini (mã lỗi ${status}).`;
 }
 
 function buildChatPrompt(messages: ChatMessage[], supportMode: SupportMode): string {
@@ -122,7 +141,10 @@ async function callGeminiInBrowser(
     }),
     signal
   });
-  if (!response.ok) throw new Error(`Gemini returned ${response.status}`);
+  if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    throw new Error(getGeminiErrorMessage(response.status, payload?.error?.status));
+  }
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== 'string') throw new Error('Gemini returned no chat content');
