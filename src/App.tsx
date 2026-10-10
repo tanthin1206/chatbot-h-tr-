@@ -324,7 +324,6 @@ export const App: React.FC = () => {
             supportMode={supportMode}
             isTyping={isChatTyping}
             error={chatError}
-            onModeChange={setSupportMode}
             onSend={(text) => sendChatMessage(text)}
             onFinish={summarizeConversation}
             onOpenSafety={() => setCurrentScreen('screen-safety')}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUp, CheckCircle2, FileHeart, HeartHandshake, Lightbulb, MessageCircle, MessagesSquare, ShieldAlert, Sparkles } from 'lucide-react';
+import { ArrowUp, CheckCircle2, FileHeart, Lightbulb, ShieldAlert } from 'lucide-react';
 import { ChatMessage, SupportMode } from '../types';
 
 interface ScreenChatConversationProps {
@@ -8,26 +8,22 @@ interface ScreenChatConversationProps {
   supportMode: SupportMode;
   isTyping: boolean;
   error: string | null;
-  onModeChange: (mode: SupportMode) => void;
   onSend: (text: string) => void;
   onFinish: () => void;
   onOpenSafety: () => void;
 }
 
-const MODES: Array<{ id: SupportMode; label: string; icon: React.ElementType }> = [
-  { id: 'listen', label: 'Chỉ lắng nghe', icon: HeartHandshake },
-  { id: 'understand', label: 'Giúp mình hiểu', icon: Sparkles },
-  { id: 'advice', label: 'Cho lời khuyên', icon: Lightbulb },
-  { id: 'prepare', label: 'Giúp mình nói', icon: MessagesSquare },
-  { id: 'calm', label: 'Bình tĩnh trước', icon: MessageCircle }
-];
+const MODE_LABELS: Record<SupportMode, string> = {
+  listen: 'Chỉ lắng nghe',
+  understand: 'Giúp tớ hiểu',
+  advice: 'Cho tớ lời khuyên'
+};
 
 export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
   messages,
   supportMode,
   isTyping,
   error,
-  onModeChange,
   onSend,
   onFinish,
   onOpenSafety
@@ -56,19 +52,11 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-bold text-slate-900">Trò chuyện cùng Mây</h1>
-          <p className="text-xs text-slate-500">Bạn có thể đổi cách Mây hỗ trợ bất cứ lúc nào.</p>
+          <p className="text-xs text-slate-500">Chế độ của Mây: <span className="font-semibold text-blue-700">{MODE_LABELS[supportMode]}</span></p>
         </div>
         <button onClick={onFinish} disabled={messages.filter((message) => message.role === 'user').length < 1 || isTyping} className="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs font-semibold text-blue-800 hover:bg-blue-100 disabled:opacity-40 inline-flex items-center gap-1.5">
           <FileHeart className="w-4 h-4" /> Gom lại điều mình vừa kể
         </button>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {MODES.map(({ id, label, icon: Icon }) => (
-          <button key={id} onClick={() => onModeChange(id)} className={`shrink-0 px-3 py-2 rounded-xl border text-xs font-medium inline-flex items-center gap-1.5 ${supportMode === id ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-stone-200 text-slate-600 hover:border-blue-300'}`}>
-            <Icon className="w-3.5 h-3.5" /> {label}
-          </button>
-        ))}
       </div>
 
       <div ref={chatPanelRef} className="min-h-[52vh] max-h-[62vh] overflow-y-auto overscroll-contain rounded-3xl border border-stone-200 bg-white/70 p-3 sm:p-5 space-y-4">

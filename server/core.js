@@ -67,7 +67,7 @@ export const chatRequestSchema = z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string().trim().min(1).max(2000)
   })).min(1).max(12),
-  supportMode: z.enum(['listen', 'understand', 'advice', 'prepare', 'calm'])
+  supportMode: z.enum(['listen', 'understand', 'advice'])
 });
 
 export const chatResponseSchema = z.object({

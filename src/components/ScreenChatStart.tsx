@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, LockKeyhole, MessageCircleHeart, PenLine, ShieldCheck } from 'lucide-react';
+import { ArrowRight, HeartHandshake, Lightbulb, LockKeyhole, MessageCircleHeart, PenLine, ShieldCheck, Sparkles } from 'lucide-react';
 import { SupportMode } from '../types';
 
 interface ScreenChatStartProps {
@@ -7,13 +7,20 @@ interface ScreenChatStartProps {
   onWritePrivately: () => void;
 }
 
+const MODES: Array<{ id: SupportMode; label: string; description: string; icon: React.ElementType }> = [
+  { id: 'listen', label: 'Chỉ lắng nghe', description: 'Mây ở đây để nghe bạn kể, chưa vội phân tích.', icon: HeartHandshake },
+  { id: 'understand', label: 'Giúp tớ hiểu', description: 'Cùng nhìn rõ sự việc, cảm xúc và điều bạn đang cần.', icon: Sparkles },
+  { id: 'advice', label: 'Cho tớ lời khuyên', description: 'Gợi ý một vài hướng đi nhỏ và thực tế.', icon: Lightbulb }
+];
+
 export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWritePrivately }) => {
   const [text, setText] = useState('');
+  const [supportMode, setSupportMode] = useState<SupportMode>('understand');
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const start = (value = text) => {
     const clean = value.trim();
-    if (clean) onStart(clean, 'understand');
+    if (clean) onStart(clean, supportMode);
   };
 
   return (
@@ -26,6 +33,31 @@ export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWri
             </span>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">Hôm nay trong lòng bạn có chuyện gì?</h1>
             <p className="text-sm sm:text-base text-slate-600 max-w-xl">Kể theo cách của bạn. Mây sẽ lắng nghe trước, không vội phân tích hay đưa lời khuyên.</p>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-slate-800">Trước khi kể, bạn muốn Mây ở bên theo cách nào?</p>
+              <p className="mt-1 text-xs text-slate-500">Không có lựa chọn đúng hay sai. Mây đã chọn sẵn “Giúp tớ hiểu” để bạn bắt đầu nhẹ nhàng hơn.</p>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label="Chọn chế độ của Mây">
+              {MODES.map(({ id, label, description, icon: Icon }) => {
+                const selected = supportMode === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setSupportMode(id)}
+                    className={`rounded-2xl border p-3 text-left transition-all ${selected ? 'border-blue-300 bg-blue-50 shadow-sm ring-2 ring-blue-100' : 'border-stone-200 bg-white hover:border-blue-200'}`}
+                  >
+                    <span className="flex items-center gap-2 text-sm font-semibold text-slate-800"><Icon className={`h-4 w-4 ${selected ? 'text-blue-600' : 'text-slate-500'}`} />{label}</span>
+                    <span className="mt-1.5 block text-[11px] leading-relaxed text-slate-500">{description}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="bg-white rounded-3xl border border-stone-200 shadow-sm p-3 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-50 transition-all gentle-glow">

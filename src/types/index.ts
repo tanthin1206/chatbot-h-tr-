@@ -57,7 +57,7 @@ export interface ReflectionResult {
 
 export type RiskLevel = 'normal' | 'needs_support' | 'urgent';
 
-export type SupportMode = 'listen' | 'understand' | 'advice' | 'prepare' | 'calm';
+export type SupportMode = 'listen' | 'understand' | 'advice';
 
 export interface ChatAdvice {
   title: string;

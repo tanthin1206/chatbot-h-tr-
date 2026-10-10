@@ -41,10 +41,8 @@ Trả về đúng JSON theo schema đã cung cấp, không thêm markdown.`;
 
 const MODE_LABELS = {
   listen: 'Chỉ lắng nghe',
-  understand: 'Giúp mình hiểu chuyện',
-  advice: 'Cho mình lời khuyên',
-  prepare: 'Giúp mình nói chuyện với họ',
-  calm: 'Giúp mình bình tĩnh trước'
+  understand: 'Giúp tớ hiểu',
+  advice: 'Cho tớ lời khuyên'
 };
 
 export function buildChatPrompt({ messages, supportMode, riskLevel }) {
@@ -62,7 +60,7 @@ Chế độ hiện tại: ${MODE_LABELS[supportMode]}.
 - Trước khi trả lời, hãy tự tách tin nhắn mới nhất thành: (1) sự việc cụ thể, (2) cảm xúc học sinh đã nói, (3) nhu cầu hoặc điều học sinh muốn được tôn trọng. Không cần hiển thị nhãn kỹ thuật này.
 - acknowledgement nêu sự việc + cảm xúc đã được nói; reflection nối sự việc với một nhu cầu ở dạng giả định; question hỏi một chi tiết thực tế đúng chủ đề. Ví dụ: “mẹ cấm chơi game” thì hỏi về lý do cấm hoặc cách thỏa thuận thời gian chơi, không hỏi chung chung về “cách người ấy nói”.
 - Tổng phần trò chuyện khoảng 40-100 từ. quickReplies có 2-4 lựa chọn ngắn.
-- listen: advice rỗng. understand: advice tối đa 1. advice: tối đa 3 lựa chọn thực tế. prepare: tối đa 2 gợi ý câu nói. calm: bài tập ổn định cơ thể ngắn.
+- listen: advice rỗng. understand: advice tối đa 1. advice: tối đa 3 lựa chọn thực tế.
 - Không lặp lại câu hỏi hoặc lời khuyên đã có trong lịch sử.
 - Không khuyên đối đầu, bỏ nhà hoặc giữ bí mật với người lớn an toàn.
 - Nếu có dấu hiệu nguy hiểm, không đưa lời khuyên đối thoại.
