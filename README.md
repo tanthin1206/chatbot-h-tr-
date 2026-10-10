@@ -45,7 +45,7 @@ Sao chép `.env.example` thành `.env`, sau đó đặt khóa API:
 
 ```env
 GEMINI_API_KEY=your_server_side_api_key
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 PORT=8787
 ```
 
@@ -83,7 +83,7 @@ Sau khi import repository vào Vercel:
 
 ```env
 GEMINI_API_KEY=AIza...
-GEMINI_MODEL=gemini-3.5-flash
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
 3. Chọn môi trường **Production**, **Preview** và **Development** nếu muốn dùng cùng một key.
@@ -97,7 +97,7 @@ Sau deploy, kiểm tra nhanh:
 https://<ten-project>.vercel.app/api/health
 ```
 
-Kết quả hợp lệ sẽ có `geminiConfigured: true` và model `gemini-3.5-flash`.
+Kết quả hợp lệ sẽ có `geminiConfigured: true` và model `gemini-3.5-flash-lite`.
 
 Nếu chưa thêm `GEMINI_API_KEY`, ứng dụng vẫn mở được và tự dùng chế độ phản tư ngoại tuyến.
 

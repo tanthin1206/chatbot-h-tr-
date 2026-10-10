@@ -1,7 +1,7 @@
 import { AnalysisResponse, ReflectionResult, ReviewWord } from '../types';
 import { checkSafety } from './safety';
 
-export const CLIENT_GEMINI_MODEL = 'gemini-3.5-flash';
+export const CLIENT_GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
 export interface ApiKeyTestResult {
   ok: boolean;

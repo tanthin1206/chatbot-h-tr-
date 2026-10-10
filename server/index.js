@@ -12,7 +12,7 @@ import { chatRequestSchema, chatResponseJsonSchema, checkSafety, normalizeChatRe
 const app = express();
 const port = Number(process.env.PORT || 8787);
 const apiKey = process.env.GEMINI_API_KEY?.trim();
-const model = process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash';
+const model = process.env.GEMINI_MODEL?.trim() || 'gemini-3.5-flash-lite';
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
