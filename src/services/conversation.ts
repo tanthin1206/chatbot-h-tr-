@@ -136,7 +136,7 @@ async function callGeminiInBrowser(
       generationConfig: {
         maxOutputTokens: 2048,
         responseMimeType: 'application/json',
-        thinkingConfig: { thinkingLevel: 'LOW' }
+        thinkingConfig: { thinkingLevel: 'MINIMAL' }
       }
     }),
     signal

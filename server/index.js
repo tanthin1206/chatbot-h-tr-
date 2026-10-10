@@ -41,7 +41,7 @@ app.post('/api/analyze', async (request, response) => {
       }),
       config: {
         maxOutputTokens: 4096,
-        thinkingConfig: { thinkingLevel: 'LOW' },
+        thinkingConfig: { thinkingLevel: 'MINIMAL' },
         responseMimeType: 'application/json',
         responseJsonSchema
       }
@@ -74,7 +74,7 @@ app.post('/api/chat', async (request, response) => {
       contents: buildChatPrompt({ messages, supportMode: input.supportMode, riskLevel: risk.level }),
       config: {
         maxOutputTokens: 2048,
-        thinkingConfig: { thinkingLevel: 'LOW' },
+        thinkingConfig: { thinkingLevel: 'MINIMAL' },
         responseMimeType: 'application/json'
       }
     });
@@ -85,7 +85,11 @@ app.post('/api/chat', async (request, response) => {
   } catch (error) {
     if (error instanceof ZodError) return response.status(400).json({ error: 'invalid_request', details: error.issues });
     console.error('Chat request failed:', error instanceof Error ? error.message : error);
-    return response.status(502).json({ error: 'chat_failed' });
+    const upstreamStatus = typeof error === 'object' && error && 'status' in error
+      ? Number(error.status)
+      : NaN;
+    const status = [400, 401, 403, 404, 429, 500, 503].includes(upstreamStatus) ? upstreamStatus : 502;
+    return response.status(status).json({ error: 'chat_failed' });
   }
 });
 
