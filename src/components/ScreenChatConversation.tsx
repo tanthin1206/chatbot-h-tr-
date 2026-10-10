@@ -30,11 +30,17 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
   onOpenSafety
 }) => {
   const [text, setText] = useState('');
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const chatPanelRef = useRef<HTMLDivElement>(null);
   const lastAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const panel = chatPanelRef.current;
+    if (!panel) return;
+    // Chỉ cuộn phần lịch sử chat, không kéo cả trang theo tin nhắn mới.
+    panel.scrollTo({
+      top: panel.scrollHeight,
+      behavior: isTyping ? 'auto' : 'smooth'
+    });
   }, [messages, isTyping]);
 
   const send = (value = text) => {
@@ -64,7 +70,7 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
         ))}
       </div>
 
-      <div className="min-h-[52vh] rounded-3xl border border-stone-200 bg-white/70 p-3 sm:p-5 space-y-4">
+      <div ref={chatPanelRef} className="min-h-[52vh] max-h-[62vh] overflow-y-auto overscroll-contain rounded-3xl border border-stone-200 bg-white/70 p-3 sm:p-5 space-y-4">
         <div className="flex gap-3 items-start">
           <img src="/illustrations/cloud-breathe.png" alt="Mây" className="w-10 h-10 object-contain shrink-0 mascot-listen" />
           <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-blue-50 border border-blue-100 p-3 text-sm text-slate-700 message-pop">
@@ -106,7 +112,6 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
             </div>
           </div>
         )}
-        <div ref={bottomRef} />
       </div>
 
       {!isTyping && lastAssistant?.response?.quickReplies && lastAssistant === messages[messages.length - 1] && (
