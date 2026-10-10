@@ -310,17 +310,6 @@ export const App: React.FC = () => {
     }
   };
 
-  const summarizeConversation = () => {
-    const transcript = chatMessages
-      .filter((message) => message.role === 'user')
-      .map((message) => message.content)
-      .join('\n\n');
-    if (!transcript) return;
-    setSession((previous) => ({ ...previous, rawText: transcript }));
-    setCurrentScreen('screen-5-analyzing');
-    runAnalysis(transcript);
-  };
-
   const getPreviousScreen = (): Screen | null => {
     switch (currentScreen) {
       case 'screen-chat-home': return 'screen-0-splash';
@@ -382,7 +371,6 @@ export const App: React.FC = () => {
               setSupportMode(mode);
               sendChatMessage(text, mode);
             }}
-            onWritePrivately={() => setCurrentScreen('screen-3-vent')}
           />
         )}
 
@@ -393,7 +381,6 @@ export const App: React.FC = () => {
             isTyping={isChatTyping}
             error={chatError}
             onSend={(text) => sendChatMessage(text)}
-            onFinish={summarizeConversation}
             onOpenSafety={() => setCurrentScreen('screen-safety')}
           />
         )}

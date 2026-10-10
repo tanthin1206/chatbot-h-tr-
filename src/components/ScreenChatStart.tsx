@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { ArrowRight, HeartHandshake, Lightbulb, LockKeyhole, MessageCircleHeart, PenLine, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, HeartHandshake, Lightbulb, LockKeyhole, MessageCircleHeart, ShieldCheck, Sparkles } from 'lucide-react';
 import { SupportMode } from '../types';
 
 interface ScreenChatStartProps {
   onStart: (text: string, mode: SupportMode) => void;
-  onWritePrivately: () => void;
 }
 
 const MODES: Array<{ id: SupportMode; label: string; description: string; icon: React.ElementType }> = [
@@ -13,7 +12,7 @@ const MODES: Array<{ id: SupportMode; label: string; description: string; icon: 
   { id: 'advice', label: 'Cho tớ lời khuyên', description: 'Gợi ý một vài hướng đi nhỏ và thực tế.', icon: Lightbulb }
 ];
 
-export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWritePrivately }) => {
+export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart }) => {
   const [text, setText] = useState('');
   const [supportMode, setSupportMode] = useState<SupportMode>('understand');
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -91,10 +90,6 @@ export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWri
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
             <button onClick={() => setShowPrivacy(!showPrivacy)} className="inline-flex items-center gap-1.5 hover:text-slate-800">
               <ShieldCheck className="w-4 h-4 text-emerald-600" /> Riêng tư · Không cần tên thật
-            </button>
-            <span className="text-stone-300">•</span>
-            <button onClick={onWritePrivately} className="inline-flex items-center gap-1.5 hover:text-blue-700">
-              <PenLine className="w-4 h-4" /> Chỉ muốn viết, không trò chuyện
             </button>
           </div>
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { ArrowUp, CheckCircle2, FileHeart, Lightbulb, ShieldAlert } from 'lucide-react';
+import { ArrowUp, CheckCircle2, Lightbulb, ShieldAlert } from 'lucide-react';
 import { ChatMessage, SupportMode } from '../types';
 
 interface ScreenChatConversationProps {
@@ -9,7 +9,6 @@ interface ScreenChatConversationProps {
   isTyping: boolean;
   error: string | null;
   onSend: (text: string) => void;
-  onFinish: () => void;
   onOpenSafety: () => void;
 }
 
@@ -25,7 +24,6 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
   isTyping,
   error,
   onSend,
-  onFinish,
   onOpenSafety
 }) => {
   const [text, setText] = useState('');
@@ -49,14 +47,11 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
 
   return (
     <div className="max-w-3xl mx-auto px-3 sm:px-4 pt-4 pb-32 space-y-4">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-3">
         <div>
           <h1 className="font-bold text-slate-900">Trò chuyện cùng Mây</h1>
           <p className="text-xs text-slate-500">Chế độ của Mây: <span className="font-semibold text-blue-700">{MODE_LABELS[supportMode]}</span></p>
         </div>
-        <button onClick={onFinish} disabled={messages.filter((message) => message.role === 'user').length < 1 || isTyping} className="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs font-semibold text-blue-800 hover:bg-blue-100 disabled:opacity-40 inline-flex items-center gap-1.5">
-          <FileHeart className="w-4 h-4" /> Gom lại điều mình vừa kể
-        </button>
       </div>
 
       <div ref={chatPanelRef} className="min-h-[52vh] max-h-[62vh] overflow-y-auto overscroll-contain rounded-3xl border border-stone-200 bg-white/70 p-3 sm:p-5 space-y-4">
@@ -108,19 +103,6 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
           </div>
         )}
       </div>
-
-      {messages.some((message) => message.role === 'user') && !isTyping && (
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 flex flex-col sm:flex-row sm:items-center gap-3 soft-pop">
-          <img src="/illustrations/cloud-untangle.png" alt="Mây đang gom lại câu chuyện" className="w-16 h-16 object-contain shrink-0 mascot-float" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-emerald-950">Khi bạn đã kể đủ cho lúc này</p>
-            <p className="text-xs text-emerald-800/80 mt-0.5">Mây sẽ dùng chính điều bạn vừa kể để tìm điểm quan trọng, nhu cầu của bạn và một bước nhỏ phù hợp.</p>
-          </div>
-          <button onClick={onFinish} className="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5">
-            Sang bước Nhìn lại <FileHeart className="w-4 h-4" />
-          </button>
-        </div>
-      )}
 
       {createPortal(
         <div className="fixed bottom-3 left-1/2 z-[100] flex w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 items-end gap-2 rounded-2xl border border-stone-200 bg-[#FAF8F5]/95 p-2 shadow-xl shadow-slate-900/15 backdrop-blur-md" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
