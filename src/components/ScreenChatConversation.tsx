@@ -135,7 +135,7 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
         </div>
       )}
 
-      <div className="bg-white border border-stone-200 rounded-2xl p-2 shadow-sm flex items-end gap-2">
+      <div className="sticky bottom-3 z-30 -mx-1 sm:mx-0 bg-[#FAF8F5]/90 backdrop-blur-md border border-stone-200 rounded-2xl p-2 shadow-lg shadow-slate-900/10 flex items-end gap-2" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
