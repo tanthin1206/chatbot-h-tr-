@@ -27,9 +27,16 @@ export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart }) => 
       <div className="grid md:grid-cols-[1fr_240px] gap-6 items-center">
         <div className="space-y-6">
           <div className="space-y-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-700">
-              <MessageCircleHeart className="w-3.5 h-3.5" /> Trò chuyện cùng Mây
-            </span>
+            <div className="flex min-h-20 items-center justify-between gap-3 md:min-h-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 text-xs font-semibold text-blue-700">
+                <MessageCircleHeart className="w-3.5 h-3.5" /> Trò chuyện cùng Mây
+              </span>
+              <img
+                src="/illustrations/cloud-journal.png"
+                alt="Mây đang mở sổ và sẵn sàng lắng nghe"
+                className={`h-20 w-20 shrink-0 object-contain drop-shadow-sm md:hidden ${text ? 'mascot-listen' : 'mascot-float'}`}
+              />
+            </div>
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900">Hôm nay trong lòng bạn có chuyện gì?</h1>
             <p className="text-sm sm:text-base text-slate-600 max-w-xl">Kể theo cách của bạn. Mây sẽ lắng nghe trước, không vội phân tích hay đưa lời khuyên.</p>
           </div>

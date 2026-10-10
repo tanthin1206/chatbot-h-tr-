@@ -27,9 +27,16 @@ export const ScreenChatHome: React.FC<ScreenChatHomeProps> = ({ sessions, onNewC
     <div className="grid items-start gap-8 md:grid-cols-[1fr_210px]">
       <div className="space-y-7">
         <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-            <MessageCircleHeart className="h-3.5 w-3.5" /> Góc trò chuyện của bạn
-          </span>
+          <div className="flex min-h-20 items-center justify-between gap-3 md:min-h-0">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+              <MessageCircleHeart className="h-3.5 w-3.5" /> Góc trò chuyện của bạn
+            </span>
+            <img
+              src="/illustrations/cloud-journal.png"
+              alt="Mây đang chờ bạn trò chuyện"
+              className="h-20 w-20 shrink-0 object-contain drop-shadow-sm mascot-float md:hidden"
+            />
+          </div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Mây vẫn ở đây khi bạn muốn kể</h1>
           <p className="max-w-xl text-sm leading-relaxed text-slate-600">Bạn có thể trò chuyện cùng Mây, hoặc chỉ viết ra rồi nhờ Mây giúp nhìn lại theo cách nhẹ nhàng hơn.</p>
         </div>
