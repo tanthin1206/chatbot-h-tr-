@@ -7,7 +7,7 @@ import { rateLimit } from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
 import { ZodError } from 'zod';
 import { buildChatPrompt, buildPrompt } from './prompt.js';
-import { chatRequestSchema, checkSafety, normalizeChatResponse, normalizeReflection, redactPersonalData, requestSchema, responseJsonSchema } from './core.js';
+import { chatRequestSchema, chatResponseJsonSchema, checkSafety, normalizeChatResponse, normalizeReflection, redactPersonalData, requestSchema, responseJsonSchema } from './core.js';
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
@@ -58,8 +58,13 @@ app.post('/api/analyze', async (request, response) => {
 });
 
 app.post('/api/chat', async (request, response) => {
+  const parsedInput = chatRequestSchema.safeParse(request.body);
+  if (!parsedInput.success) {
+    return response.status(400).json({ error: 'invalid_request', details: parsedInput.error.issues });
+  }
+
   try {
-    const input = chatRequestSchema.parse(request.body);
+    const input = parsedInput.data;
     const latestUserText = [...input.messages].reverse().find((message) => message.role === 'user')?.content || '';
     const risk = checkSafety(latestUserText);
     if (risk.level === 'urgent') return response.json({ response: null, mode: 'offline', risk });
@@ -75,7 +80,8 @@ app.post('/api/chat', async (request, response) => {
       config: {
         maxOutputTokens: 2048,
         thinkingConfig: { thinkingLevel: 'MINIMAL' },
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        responseJsonSchema: chatResponseJsonSchema
       }
     });
     if (!geminiResponse.text) throw new Error('Gemini returned an empty chat response');
@@ -83,7 +89,10 @@ app.post('/api/chat', async (request, response) => {
     if (chatResponse.riskLevel === 'urgent') return response.json({ response: null, mode: 'gemini', risk: { level: 'urgent', reasons: ['model_detected_risk'] } });
     return response.json({ response: chatResponse, mode: 'gemini', risk: { ...risk, level: chatResponse.riskLevel } });
   } catch (error) {
-    if (error instanceof ZodError) return response.status(400).json({ error: 'invalid_request', details: error.issues });
+    if (error instanceof ZodError) {
+      console.error('Gemini chat response validation failed:', error.issues);
+      return response.status(502).json({ error: 'invalid_chat_response' });
+    }
     console.error('Chat request failed:', error instanceof Error ? error.message : error);
     const upstreamStatus = typeof error === 'object' && error && 'status' in error
       ? Number(error.status)

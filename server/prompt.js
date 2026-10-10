@@ -73,5 +73,6 @@ ${riskLevel === 'needs_support' ? '- Người dùng đang chịu áp lực mạn
 ${history}
 </conversation>
 
-Trả về đúng JSON theo schema, không thêm markdown.`;
+Trả về đúng JSON theo cấu trúc sau, không thêm markdown:
+{"acknowledgement":"...","reflection":"...","question":"...","quickReplies":[],"advice":[{"title":"...","explanation":"...","firstStep":"...","caution":"..."}],"riskLevel":"normal|needs_support|urgent"}`;
 }

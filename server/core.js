@@ -111,7 +111,7 @@ export const chatResponseJsonSchema = {
       type: 'array', maxItems: 3,
       items: {
         type: 'object', additionalProperties: false,
-        required: ['title', 'explanation', 'firstStep', 'caution'],
+        required: ['title', 'explanation', 'firstStep'],
         properties: {
           title: { type: 'string' }, explanation: { type: 'string' }, firstStep: { type: 'string' }, caution: { type: 'string' }
         }
