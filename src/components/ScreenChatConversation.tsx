@@ -31,8 +31,6 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
 }) => {
   const [text, setText] = useState('');
   const chatPanelRef = useRef<HTMLDivElement>(null);
-  const lastAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
-
   useEffect(() => {
     const panel = chatPanelRef.current;
     if (!panel) return;
@@ -113,14 +111,6 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
           </div>
         )}
       </div>
-
-      {!isTyping && lastAssistant?.response?.quickReplies && lastAssistant === messages[messages.length - 1] && (
-        <div className="flex flex-wrap gap-2">
-          {lastAssistant.response.quickReplies.map((reply) => (
-            <button key={reply} onClick={() => send(reply)} className="px-3 py-2 rounded-full border border-blue-200 bg-blue-50 text-xs text-blue-800 hover:bg-blue-100 interactive-card">{reply}</button>
-          ))}
-        </div>
-      )}
 
       {messages.some((message) => message.role === 'user') && !isTyping && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 flex flex-col sm:flex-row sm:items-center gap-3 soft-pop">

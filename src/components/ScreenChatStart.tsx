@@ -7,13 +7,6 @@ interface ScreenChatStartProps {
   onWritePrivately: () => void;
 }
 
-const STARTERS = [
-  'Mình đang giận bố mẹ',
-  'Mình cảm thấy không được hiểu',
-  'Mình vừa có một chuyện rất khó chịu',
-  'Mình không biết bắt đầu từ đâu'
-];
-
 export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWritePrivately }) => {
   const [text, setText] = useState('');
   const [showPrivacy, setShowPrivacy] = useState(false);
@@ -61,14 +54,6 @@ export const ScreenChatStart: React.FC<ScreenChatStartProps> = ({ onStart, onWri
                 Kể với Mây <ArrowRight className="w-4 h-4" />
               </button>
             </div>
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {STARTERS.map((starter) => (
-              <button key={starter} onClick={() => start(starter)} className="interactive-card px-3 py-2 rounded-full bg-white border border-stone-200 text-xs text-slate-600 hover:border-blue-300 hover:text-blue-700 transition-colors">
-                {starter}
-              </button>
-            ))}
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
