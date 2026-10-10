@@ -62,9 +62,14 @@ export async function continueConversation(
 
 function createOfflineReply(text: string, mode: SupportMode, riskLevel: RiskLevel): ChatResponse {
   const topic = text.length > 120 ? `${text.slice(0, 117)}…` : text;
+  const concreteEvent = describeConcreteEvent(topic);
   const common = {
-    acknowledgement: 'Mây đang nghe bạn. Điều bạn kể có vẻ đã khiến bạn phải giữ trong lòng khá nhiều.',
-    reflection: topic ? `Điều nổi bật lúc này là: “${topic}”` : undefined,
+    acknowledgement: topic
+      ? `Ừ, Mây nghe bạn đang nói về ${concreteEvent}. Nghe vậy hẳn không dễ chịu chút nào.`
+      : 'Ừ, Mây đang ở đây và nghe bạn.',
+    reflection: topic
+      ? `Mây muốn tách hai phần: việc vừa xảy ra là “${topic}”; còn cảm xúc của bạn sau đó có thể là buồn, tức, tủi thân hoặc một điều khác.`
+      : undefined,
     riskLevel
   };
 
@@ -85,11 +90,22 @@ function createOfflineReply(text: string, mode: SupportMode, riskLevel: RiskLeve
     };
   }
   return {
-    ...common,
-    question: mode === 'understand' ? 'Điều làm bạn đau nhất là chuyện đã xảy ra, hay cảm giác mình không được hiểu?' : 'Bạn muốn kể thêm điều gì đã xảy ra ngay trước đó?',
-    quickReplies: ['Mình muốn kể tiếp', 'Đúng, mình thấy không được hiểu', 'Giúp mình nhìn rõ hơn'],
-    advice: []
+      ...common,
+      question: mode === 'understand'
+        ? `Trong chuyện ${concreteEvent}, điều chạm vào bạn nhất là lời nói, cách người ấy nói, hay cảm giác bạn không được lắng nghe?`
+        : `Bạn muốn kể thêm điều gì đã xảy ra ngay trước hoặc sau ${concreteEvent}?`,
+      quickReplies: ['Mình muốn kể tiếp', 'Đúng, mình thấy không được hiểu', 'Giúp mình nhìn rõ hơn'],
+      advice: []
   };
+}
+
+function describeConcreteEvent(text: string): string {
+  const clean = text.trim().replace(/[.!?]+$/, '');
+  if (/mẹ.{0,24}(mắng|la|quát)/i.test(clean)) return 'việc mẹ mắng bạn';
+  if (/bố|ba|cha/.test(clean) && /(mắng|la|quát)/i.test(clean)) return 'việc bố mắng bạn';
+  if (/không được lắng nghe/i.test(clean)) return 'cảm giác bạn không được lắng nghe';
+  if (/quyết định thay/i.test(clean)) return 'việc người khác quyết định thay bạn';
+  return `điều bạn vừa kể: “${clean}”`;
 }
 
 function buildChatPrompt(messages: ChatMessage[], supportMode: SupportMode): string {
@@ -102,6 +118,10 @@ QUY TẮC
 - Không tự nhận là người thật hoặc chuyên gia tâm lý.
 - Chỉ đặt tối đa một câu hỏi mỗi lượt.
 - acknowledgement tối đa 2 câu; reflection tối đa 1 câu; question tối đa 1 câu.
+- Phải bám vào tin nhắn mới nhất: nhắc lại ít nhất một danh từ hoặc hành động cụ thể trong đó (ví dụ “mẹ mắng”, “bị quyết định thay”), không dùng lời mở đầu chung chung như “điều bạn kể đã khiến bạn phải giữ trong lòng khá nhiều”.
+- acknowledgement phải thân thiện, tự nhiên và không khẳng định thay cảm xúc của học sinh; nếu chưa chắc, dùng “có thể”, “nghe như”, hoặc hỏi để xác nhận.
+- reflection phải tách rõ việc đã xảy ra và cảm xúc/nhu cầu có thể có; không chỉ lặp nguyên văn tin nhắn.
+- question phải nối trực tiếp với chi tiết vừa được nhắc và giúp học sinh kể sâu thêm một bước.
 - Tổng phần văn bản trò chuyện khoảng 40-100 từ.
 - quickReplies gồm 2-4 lựa chọn ngắn, tự nhiên.
 - Chế độ listen: advice phải rỗng; chủ yếu lắng nghe và hỏi nhẹ.
