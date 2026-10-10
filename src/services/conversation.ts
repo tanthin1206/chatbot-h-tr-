@@ -148,7 +148,7 @@ async function callGeminiInBrowser(
   const data = await response.json();
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== 'string') throw new Error('Gemini returned no chat content');
-  const parsed: unknown = JSON.parse(text);
+  const parsed: unknown = parseGeminiJson(text);
   if (!isChatResponse(parsed)) throw new Error('Invalid chat response');
   return compactChatResponse(parsed);
 }
@@ -157,11 +157,21 @@ function isChatResponse(value: unknown): value is ChatResponse {
   if (!value || typeof value !== 'object') return false;
   const item = value as Partial<ChatResponse>;
   return typeof item.acknowledgement === 'string'
-    && Array.isArray(item.quickReplies)
-    && item.quickReplies.every((reply) => typeof reply === 'string')
-    && Array.isArray(item.advice)
-    && item.advice.every((advice) => typeof advice.title === 'string' && typeof advice.explanation === 'string' && typeof advice.firstStep === 'string')
-    && ['normal', 'needs_support', 'urgent'].includes(item.riskLevel || '');
+    && (item.quickReplies === undefined || (Array.isArray(item.quickReplies) && item.quickReplies.every((reply) => typeof reply === 'string')))
+    && (item.advice === undefined || (Array.isArray(item.advice) && item.advice.every((advice) => typeof advice.title === 'string' && typeof advice.explanation === 'string' && typeof advice.firstStep === 'string')))
+    && (item.riskLevel === undefined || ['normal', 'needs_support', 'urgent'].includes(item.riskLevel));
+}
+
+function parseGeminiJson(text: string): unknown {
+  const trimmed = text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start === -1 || end <= start) throw new Error('Gemini returned invalid chat JSON');
+    return JSON.parse(trimmed.slice(start, end + 1));
+  }
 }
 
 function compact(text: string | undefined, max: number): string | undefined {
@@ -175,13 +185,13 @@ function compactChatResponse(response: ChatResponse): ChatResponse {
     acknowledgement: compact(response.acknowledgement, 320) || '',
     reflection: compact(response.reflection, 240),
     question: compact(response.question, 220),
-    quickReplies: response.quickReplies.slice(0, 4).map((reply) => compact(reply, 80) || ''),
-    advice: response.advice.slice(0, 3).map((advice) => ({
+    quickReplies: (response.quickReplies || []).slice(0, 4).map((reply) => compact(reply, 80) || ''),
+    advice: (response.advice || []).slice(0, 3).map((advice) => ({
       title: compact(advice.title, 100) || '',
       explanation: compact(advice.explanation, 260) || '',
       firstStep: compact(advice.firstStep, 220) || '',
       caution: compact(advice.caution, 180)
     })),
-    riskLevel: response.riskLevel
+    riskLevel: response.riskLevel || 'normal'
   };
 }

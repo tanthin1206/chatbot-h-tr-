@@ -7,7 +7,7 @@ import { rateLimit } from 'express-rate-limit';
 import { GoogleGenAI } from '@google/genai';
 import { ZodError } from 'zod';
 import { buildChatPrompt, buildPrompt } from './prompt.js';
-import { chatRequestSchema, chatResponseJsonSchema, checkSafety, normalizeChatResponse, normalizeReflection, redactPersonalData, requestSchema, responseJsonSchema } from './core.js';
+import { chatRequestSchema, checkSafety, normalizeChatResponse, normalizeReflection, redactPersonalData, requestSchema, responseJsonSchema } from './core.js';
 
 const app = express();
 const port = Number(process.env.PORT || 8787);
@@ -75,12 +75,11 @@ app.post('/api/chat', async (request, response) => {
       config: {
         maxOutputTokens: 2048,
         thinkingConfig: { thinkingLevel: 'LOW' },
-        responseMimeType: 'application/json',
-        responseJsonSchema: chatResponseJsonSchema
+        responseMimeType: 'application/json'
       }
     });
     if (!geminiResponse.text) throw new Error('Gemini returned an empty chat response');
-    const chatResponse = normalizeChatResponse(JSON.parse(geminiResponse.text), risk.level);
+    const chatResponse = normalizeChatResponse(parseGeminiJson(geminiResponse.text), risk.level);
     if (chatResponse.riskLevel === 'urgent') return response.json({ response: null, mode: 'gemini', risk: { level: 'urgent', reasons: ['model_detected_risk'] } });
     return response.json({ response: chatResponse, mode: 'gemini', risk: { ...risk, level: chatResponse.riskLevel } });
   } catch (error) {
@@ -89,6 +88,22 @@ app.post('/api/chat', async (request, response) => {
     return response.status(502).json({ error: 'chat_failed' });
   }
 });
+
+function parseGeminiJson(text) {
+  const trimmed = text.trim();
+  const withoutFence = trimmed
+    .replace(/^```(?:json)?\s*/i, '')
+    .replace(/\s*```$/i, '')
+    .trim();
+  try {
+    return JSON.parse(withoutFence);
+  } catch {
+    const start = withoutFence.indexOf('{');
+    const end = withoutFence.lastIndexOf('}');
+    if (start === -1 || end <= start) throw new Error('Gemini returned invalid chat JSON');
+    return JSON.parse(withoutFence.slice(start, end + 1));
+  }
+}
 
 app.use(express.static(path.join(rootDir, 'dist')));
 app.get('*splat', (_request, response) => response.sendFile(path.join(rootDir, 'dist', 'index.html')));

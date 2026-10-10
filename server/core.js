@@ -74,14 +74,14 @@ export const chatResponseSchema = z.object({
   acknowledgement: z.string().min(1).max(800),
   reflection: z.string().max(500).optional(),
   question: z.string().max(400).optional(),
-  quickReplies: z.array(z.string().min(1).max(120)).max(4),
+  quickReplies: z.array(z.string().min(1).max(120)).max(4).optional().default([]),
   advice: z.array(z.object({
     title: z.string().min(1).max(140),
     explanation: z.string().min(1).max(500),
     firstStep: z.string().min(1).max(400),
     caution: z.string().max(300).optional()
-  })).max(3),
-  riskLevel: z.enum(['normal', 'needs_support', 'urgent'])
+  })).max(3).optional().default([]),
+  riskLevel: z.enum(['normal', 'needs_support', 'urgent']).optional().default('normal')
 });
 
 export function normalizeChatResponse(value, riskLevel = 'normal') {
