@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ChatMessage, Screen, SessionState, SavedDraft, ReflectionResult, SupportMode } from './types';
-import { Header } from './components/Header';
 import { Screen0Splash } from './components/Screen0Splash';
 import { ScreenChatStart } from './components/ScreenChatStart';
 import { ScreenChatConversation } from './components/ScreenChatConversation';
@@ -264,14 +263,6 @@ export const App: React.FC = () => {
         <span className="ambient-orb ambient-orb-two" />
         <span className="ambient-orb ambient-orb-three" />
       </div>
-      {/* Thanh điều hướng chính (Header) */}
-      <Header
-        currentScreen={currentScreen}
-        onNavigate={setCurrentScreen}
-        onOpenDrafts={() => setIsDraftsOpen(true)}
-        onOpenSafety={() => setCurrentScreen('screen-safety')}
-      />
-
       {/* Vùng hiển thị màn hình chính theo tiến trình */}
       <main key={currentScreen} className="relative z-10 flex-1 pb-16 screen-enter">
         {currentScreen === 'screen-0-splash' && (
