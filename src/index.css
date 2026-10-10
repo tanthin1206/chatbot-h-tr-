@@ -1,16 +1,102 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
   :root {
     --font-sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color-scheme: light;
+    --app-bg: #FAF8F5;
+    --app-text: #1E293B;
+  }
+
+  html.dark {
+    color-scheme: dark;
+    --app-bg: #070D1A;
+    --app-text: #E2E8F0;
   }
 
   body {
     font-family: var(--font-sans);
-    background-color: #FAF8F5;
-    color: #1E293B;
+    background-color: var(--app-bg);
+    color: var(--app-text);
+    transition: background-color .25s ease, color .25s ease;
   }
 }
+
+/* Dark-mode bridge for the existing warm, light utility palette. */
+html.dark [class~="bg-white"],
+html.dark [class~="bg-white/60"],
+html.dark [class~="bg-white/70"],
+html.dark [class~="bg-white/80"],
+html.dark [class~="bg-white/85"],
+html.dark [class~="bg-white/90"],
+html.dark [class~="bg-white/95"] {
+  background-color: rgb(15 23 42 / .9) !important;
+}
+
+html.dark [class~="bg-[#FAF8F5]/90"],
+html.dark [class~="bg-[#FAF8F5]/95"],
+html.dark [class~="bg-stone-50"],
+html.dark [class~="bg-stone-100"] {
+  background-color: rgb(7 13 26 / .94) !important;
+}
+
+html.dark [class~="bg-blue-50"] { background-color: rgb(30 58 138 / .28) !important; }
+html.dark [class~="bg-blue-100"] { background-color: rgb(30 64 175 / .34) !important; }
+html.dark [class~="bg-purple-50"] { background-color: rgb(88 28 135 / .24) !important; }
+html.dark [class~="bg-purple-100"] { background-color: rgb(107 33 168 / .32) !important; }
+html.dark [class~="bg-rose-50"] { background-color: rgb(136 19 55 / .22) !important; }
+html.dark [class~="bg-emerald-50"] { background-color: rgb(6 78 59 / .28) !important; }
+html.dark [class~="bg-amber-50"] { background-color: rgb(120 53 15 / .24) !important; }
+html.dark [class~="bg-red-50"] { background-color: rgb(127 29 29 / .26) !important; }
+
+html.dark [class~="from-blue-50"] {
+  --tw-gradient-from: rgb(30 58 138 / .42) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(30 58 138 / 0) var(--tw-gradient-to-position) !important;
+}
+html.dark [class~="from-purple-50"] {
+  --tw-gradient-from: rgb(88 28 135 / .38) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(88 28 135 / 0) var(--tw-gradient-to-position) !important;
+}
+html.dark [class~="from-[#F1ECFF]"] {
+  --tw-gradient-from: rgb(76 29 149 / .34) var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgb(76 29 149 / 0) var(--tw-gradient-to-position) !important;
+}
+html.dark [class~="to-purple-50"] { --tw-gradient-to: rgb(88 28 135 / .32) var(--tw-gradient-to-position) !important; }
+html.dark [class~="to-rose-50"] { --tw-gradient-to: rgb(136 19 55 / .3) var(--tw-gradient-to-position) !important; }
+html.dark [class~="to-[#EAF7FF]"] { --tw-gradient-to: rgb(12 74 110 / .32) var(--tw-gradient-to-position) !important; }
+
+html.dark [class~="text-slate-900"],
+html.dark [class~="text-slate-800"] { color: #F1F5F9 !important; }
+html.dark [class~="text-slate-700"],
+html.dark [class~="text-slate-600"] { color: #CBD5E1 !important; }
+html.dark [class~="text-slate-500"] { color: #94A3B8 !important; }
+html.dark [class~="text-slate-400"] { color: #7C8CA3 !important; }
+
+html.dark [class~="border-stone-100"],
+html.dark [class~="border-stone-200"],
+html.dark [class~="border-stone-300"] { border-color: rgb(71 85 105 / .72) !important; }
+html.dark [class~="border-blue-100"],
+html.dark [class~="border-blue-200"] { border-color: rgb(59 130 246 / .48) !important; }
+html.dark [class~="border-purple-200"] { border-color: rgb(168 85 247 / .46) !important; }
+html.dark [class~="border-rose-200"] { border-color: rgb(244 63 94 / .4) !important; }
+html.dark [class~="border-emerald-200"] { border-color: rgb(16 185 129 / .4) !important; }
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  color: #E2E8F0;
+  caret-color: #93C5FD;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder { color: #64748B; }
+
+html.dark .ambient-orb { opacity: .18; }
+html.dark .ambient-orb-one { background: rgb(30 64 175 / .55); }
+html.dark .ambient-orb-two { background: rgb(107 33 168 / .5); }
+html.dark .ambient-orb-three { background: rgb(5 150 105 / .35); }
+html.dark .interactive-card:hover { box-shadow: 0 14px 30px rgb(0 0 0 / .28); }
 
 /* Custom gentle breathing animation */
 @keyframes breathe {

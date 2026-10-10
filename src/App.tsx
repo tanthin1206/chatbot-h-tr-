@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Moon, Sun } from 'lucide-react';
 import { ChatMessage, ChatSession, Screen, SessionState, SavedDraft, ReflectionResult, SupportMode } from './types';
 import { Screen0Splash } from './components/Screen0Splash';
 import { ScreenChatHome } from './components/ScreenChatHome';
@@ -25,11 +25,17 @@ const STORAGE_KEY_DRAFTS = 'khoang_tho_saved_drafts';
 const STORAGE_KEY_BROWSER_API_KEY = 'khoang_tho_browser_gemini_key';
 const STORAGE_KEY_REDUCED_MOTION = 'khoang_tho_reduced_motion';
 const STORAGE_KEY_CHAT_SESSIONS = 'khoang_tho_chat_sessions';
+const STORAGE_KEY_THEME = 'khoang_tho_theme';
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('screen-0-splash');
   const [geminiConfigured, setGeminiConfigured] = useState<boolean | null>(null);
   const [browserApiKey, setBrowserApiKey] = useState(() => sessionStorage.getItem(STORAGE_KEY_BROWSER_API_KEY) || '');
   const [reducedMotion, setReducedMotion] = useState(() => localStorage.getItem(STORAGE_KEY_REDUCED_MOTION) === 'true');
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
+    if (savedTheme) return savedTheme === 'dark';
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+  });
   const [drafts, setDrafts] = useState<SavedDraft[]>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_DRAFTS);
@@ -90,6 +96,12 @@ export const App: React.FC = () => {
   }, [reducedMotion]);
 
   useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    document.documentElement.dataset.theme = isDarkMode ? 'dark' : 'light';
+    localStorage.setItem(STORAGE_KEY_THEME, isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
+
+  useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY_CHAT_SESSIONS, JSON.stringify(chatSessions));
     } catch (error) {
@@ -126,11 +138,13 @@ export const App: React.FC = () => {
     localStorage.removeItem(STORAGE_KEY_DRAFTS);
     localStorage.removeItem(STORAGE_KEY_REDUCED_MOTION);
     localStorage.removeItem(STORAGE_KEY_CHAT_SESSIONS);
+    localStorage.removeItem(STORAGE_KEY_THEME);
     sessionStorage.removeItem(STORAGE_KEY_BROWSER_API_KEY);
     setDrafts([]);
     setChatSessions([]);
     setBrowserApiKey('');
     setReducedMotion(false);
+    setIsDarkMode(false);
     handleEmergencyExit();
   };
 
@@ -331,28 +345,40 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative isolate min-h-screen flex flex-col bg-[#FAF8F5]/90 text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+    <div className="relative isolate min-h-screen flex flex-col bg-[#FAF8F5]/90 text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden dark:bg-slate-950 dark:text-slate-100 dark:selection:bg-blue-900 dark:selection:text-blue-100">
       <div className="ambient-scene" aria-hidden="true">
         <span className="ambient-orb ambient-orb-one" />
         <span className="ambient-orb ambient-orb-two" />
         <span className="ambient-orb ambient-orb-three" />
       </div>
+      {getPreviousScreen() && (
+        <button
+          type="button"
+          aria-label="Quay lại"
+          title="Quay lại"
+          onClick={() => {
+            const previous = getPreviousScreen();
+            if (previous) setCurrentScreen(previous);
+          }}
+          className="fixed left-3 z-[70] inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur transition-all hover:-translate-x-0.5 hover:border-blue-300 hover:text-blue-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-200 dark:hover:border-blue-500 dark:hover:text-blue-300"
+          style={{ top: 'calc(0.75rem + env(safe-area-inset-top))' }}
+        >
+          <ArrowLeft className="h-4.5 w-4.5" />
+        </button>
+      )}
+      <button
+        type="button"
+        aria-label={isDarkMode ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
+        title={isDarkMode ? 'Giao diện sáng' : 'Giao diện tối'}
+        aria-pressed={isDarkMode}
+        onClick={() => setIsDarkMode((current) => !current)}
+        className="fixed right-3 z-[70] inline-flex h-10 w-10 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-slate-600 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:text-blue-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-700 dark:bg-slate-900/90 dark:text-amber-300 dark:hover:border-amber-400 dark:hover:text-amber-200"
+        style={{ top: 'calc(0.75rem + env(safe-area-inset-top))' }}
+      >
+        {isDarkMode ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+      </button>
       {/* Vùng hiển thị màn hình chính theo tiến trình */}
       <main key={currentScreen} className="relative z-10 flex-1 pb-16 screen-enter">
-        {getPreviousScreen() && (
-          <div className="max-w-3xl mx-auto px-4 pt-4">
-            <button
-              type="button"
-              onClick={() => {
-                const previous = getPreviousScreen();
-                if (previous) setCurrentScreen(previous);
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-white/80 border border-stone-200 hover:border-blue-300 hover:text-blue-700 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" /> Quay lại
-            </button>
-          </div>
-        )}
         {currentScreen === 'screen-0-splash' && (
           <Screen0Splash onProceed={() => setCurrentScreen('screen-chat-home')} />
         )}
