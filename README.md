@@ -72,6 +72,35 @@ npm start
 npm test
 ```
 
+## Deploy lên Vercel và cấu hình Gemini
+
+Project đã có sẵn `vercel.json` và các route serverless cho `/api/health`, `/api/analyze` và `/api/chat`.
+
+Sau khi import repository vào Vercel:
+
+1. Mở **Project → Settings → Environment Variables**.
+2. Thêm biến:
+
+```env
+GEMINI_API_KEY=AIza...
+GEMINI_MODEL=gemini-3.5-flash
+```
+
+3. Chọn môi trường **Production**, **Preview** và **Development** nếu muốn dùng cùng một key.
+4. Bấm **Save**, sau đó vào **Deployments → Redeploy** để deployment mới nhận biến môi trường.
+
+Không commit API key vào GitHub và không đặt key với tiền tố `VITE_`, vì biến `VITE_` sẽ bị đưa xuống trình duyệt. Với Vercel, Gemini được gọi từ serverless function nên key nằm ở biến môi trường phía máy chủ.
+
+Sau deploy, kiểm tra nhanh:
+
+```text
+https://<ten-project>.vercel.app/api/health
+```
+
+Kết quả hợp lệ sẽ có `geminiConfigured: true` và model `gemini-3.5-flash`.
+
+Nếu chưa thêm `GEMINI_API_KEY`, ứng dụng vẫn mở được và tự dùng chế độ phản tư ngoại tuyến.
+
 ## Cấu trúc lõi
 
 - `server/index.js`: API backend, rate limit, gọi Gemini và phục vụ bản production.

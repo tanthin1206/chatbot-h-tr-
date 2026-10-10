@@ -93,7 +93,16 @@ app.post('/api/chat', async (request, response) => {
 app.use(express.static(path.join(rootDir, 'dist')));
 app.get('*splat', (_request, response) => response.sendFile(path.join(rootDir, 'dist', 'index.html')));
 
-app.listen(port, () => {
-  console.log(`Khoảng Thở API listening on http://localhost:${port}`);
-  console.log(ai ? `Gemini enabled with ${model}` : 'Gemini disabled: set GEMINI_API_KEY to enable it');
-});
+// Vercel imports the Express app as a serverless function. The local server
+// should only start when this file is run directly with `npm start`.
+const isDirectRun = process.argv[1]
+  && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  app.listen(port, () => {
+    console.log(`Khoảng Thở API listening on http://localhost:${port}`);
+    console.log(ai ? `Gemini enabled with ${model}` : 'Gemini disabled: set GEMINI_API_KEY to enable it');
+  });
+}
+
+export default app;
