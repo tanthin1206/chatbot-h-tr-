@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, BookmarkCheck, RefreshCw, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { RefreshCw, CheckCircle2 } from 'lucide-react';
 import { SessionState } from '../types';
 
 interface Screen10FinishProps {
@@ -70,57 +70,6 @@ export const Screen10Finish: React.FC<Screen10FinishProps> = ({
           </p>
         </div>
       )}
-
-      {/* Các lựa chọn kết thúc */}
-      <div className="space-y-3">
-        {/* Nút Xóa toàn bộ ngay */}
-        <button
-          onClick={handleWipe}
-          className="interactive-card w-full p-4 rounded-2xl border border-rose-200 bg-rose-50/60 hover:bg-rose-50 text-left flex items-start space-x-3.5 transition-colors group"
-        >
-          <div className="p-2 rounded-xl bg-rose-100 text-rose-700 shrink-0 mt-0.5 group-hover:bg-rose-200 transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-rose-900">Xóa toàn bộ ngay</h4>
-            <p className="text-xs text-rose-700/80 mt-0.5">
-              Xóa sạch bài viết và kết quả phân tích khỏi bộ nhớ trình duyệt để đảm bảo an toàn tuyệt đối.
-            </p>
-          </div>
-        </button>
-
-        {/* Nút chỉ lưu câu muốn nói */}
-        <button
-          onClick={handleSaveOnlyDialogue}
-          className="interactive-card w-full p-4 rounded-2xl border border-stone-200 bg-white hover:border-blue-300 text-left flex items-start space-x-3.5 transition-colors group"
-        >
-          <div className="p-2 rounded-xl bg-blue-50 text-blue-600 shrink-0 mt-0.5 group-hover:bg-blue-100 transition-colors">
-            <BookmarkCheck className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-800">Chỉ lưu câu muốn nói trên thiết bị</h4>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Lưu giữ câu giao tiếp đã chuẩn bị để khi cần có thể mở xem lại, xóa bài viết xả giận ban đầu.
-            </p>
-          </div>
-        </button>
-
-        {/* Nút lưu bản nháp đầy đủ */}
-        <button
-          onClick={handleSaveFullDraft}
-          className="interactive-card w-full p-4 rounded-2xl border border-stone-200 bg-white hover:border-purple-300 text-left flex items-start space-x-3.5 transition-colors group"
-        >
-          <div className="p-2 rounded-xl bg-purple-50 text-purple-600 shrink-0 mt-0.5 group-hover:bg-purple-100 transition-colors">
-            <ShieldCheck className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-sm font-semibold text-slate-800">Lưu bản nháp đầy đủ trên thiết bị</h4>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Lưu toàn bộ phiên làm việc trên máy bạn để theo dõi hành trình cảm xúc theo thời gian.
-            </p>
-          </div>
-        </button>
-      </div>
 
       {/* Bắt đầu phiên mới */}
       <div className="pt-2 text-center">

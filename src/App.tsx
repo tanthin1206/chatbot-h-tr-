@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { ChatMessage, Screen, SessionState, SavedDraft, ReflectionResult, SupportMode } from './types';
 import { Screen0Splash } from './components/Screen0Splash';
 import { ScreenChatStart } from './components/ScreenChatStart';
@@ -256,6 +257,25 @@ export const App: React.FC = () => {
     runAnalysis(transcript);
   };
 
+  const getPreviousScreen = (): Screen | null => {
+    switch (currentScreen) {
+      case 'screen-chat-start': return 'screen-0-splash';
+      case 'screen-chat-conversation': return 'screen-chat-start';
+      case 'screen-1-intro': return 'screen-chat-start';
+      case 'screen-2-checkin': return 'screen-1-intro';
+      case 'screen-3-vent': return 'screen-2-checkin';
+      case 'screen-4-confirm': return 'screen-3-vent';
+      case 'screen-5-analyzing': return 'screen-3-vent';
+      case 'screen-6-reflection': return chatMessages.length ? 'screen-chat-conversation' : 'screen-5-analyzing';
+      case 'screen-7-composer': return 'screen-6-reflection';
+      case 'screen-8-next-actions': return 'screen-7-composer';
+      case 'screen-9-checkout': return 'screen-8-next-actions';
+      case 'screen-10-finish': return 'screen-9-checkout';
+      case 'screen-safety': return chatMessages.length ? 'screen-chat-conversation' : 'screen-chat-start';
+      default: return null;
+    }
+  };
+
   return (
     <div className="relative isolate min-h-screen flex flex-col bg-[#FAF8F5]/90 text-slate-800 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
       <div className="ambient-scene" aria-hidden="true">
@@ -265,6 +285,20 @@ export const App: React.FC = () => {
       </div>
       {/* Vùng hiển thị màn hình chính theo tiến trình */}
       <main key={currentScreen} className="relative z-10 flex-1 pb-16 screen-enter">
+        {getPreviousScreen() && (
+          <div className="max-w-3xl mx-auto px-4 pt-4">
+            <button
+              type="button"
+              onClick={() => {
+                const previous = getPreviousScreen();
+                if (previous) setCurrentScreen(previous);
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 bg-white/80 border border-stone-200 hover:border-blue-300 hover:text-blue-700 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Quay lại
+            </button>
+          </div>
+        )}
         {currentScreen === 'screen-0-splash' && (
           <Screen0Splash onProceed={() => setCurrentScreen('screen-chat-start')} />
         )}
