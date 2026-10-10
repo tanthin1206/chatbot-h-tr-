@@ -1,5 +1,6 @@
 export type Screen =
   | 'screen-0-splash'
+  | 'screen-chat-home'
   | 'screen-chat-start'
   | 'screen-chat-conversation'
   | 'screen-1-intro'
@@ -80,6 +81,15 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   response?: ChatResponse;
+}
+
+export interface ChatSession {
+  id: string;
+  createdAt: number;
+  updatedAt: number;
+  title: string;
+  supportMode: SupportMode;
+  messages: ChatMessage[];
 }
 
 export interface AnalysisResponse {

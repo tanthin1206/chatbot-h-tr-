@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { ChatMessage, Screen, SessionState, SavedDraft, ReflectionResult, SupportMode } from './types';
+import { ChatMessage, ChatSession, Screen, SessionState, SavedDraft, ReflectionResult, SupportMode } from './types';
 import { Screen0Splash } from './components/Screen0Splash';
+import { ScreenChatHome } from './components/ScreenChatHome';
 import { ScreenChatStart } from './components/ScreenChatStart';
 import { ScreenChatConversation } from './components/ScreenChatConversation';
 import { Screen1Intro } from './components/Screen1Intro';
@@ -23,6 +24,7 @@ import { continueConversation } from './services/conversation';
 const STORAGE_KEY_DRAFTS = 'khoang_tho_saved_drafts';
 const STORAGE_KEY_BROWSER_API_KEY = 'khoang_tho_browser_gemini_key';
 const STORAGE_KEY_REDUCED_MOTION = 'khoang_tho_reduced_motion';
+const STORAGE_KEY_CHAT_SESSIONS = 'khoang_tho_chat_sessions';
 export const App: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>('screen-0-splash');
   const [geminiConfigured, setGeminiConfigured] = useState<boolean | null>(null);
@@ -44,6 +46,15 @@ export const App: React.FC = () => {
   const analysisController = useRef<AbortController | null>(null);
   const chatController = useRef<AbortController | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [activeChatId, setActiveChatId] = useState<string | null>(null);
+  const [chatSessions, setChatSessions] = useState<ChatSession[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_CHAT_SESSIONS);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [supportMode, setSupportMode] = useState<SupportMode>('understand');
   const [isChatTyping, setIsChatTyping] = useState(false);
   const [chatError, setChatError] = useState<string | null>(null);
@@ -78,6 +89,31 @@ export const App: React.FC = () => {
     localStorage.setItem(STORAGE_KEY_REDUCED_MOTION, String(reducedMotion));
   }, [reducedMotion]);
 
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_CHAT_SESSIONS, JSON.stringify(chatSessions));
+    } catch (error) {
+      console.error('Không thể lưu lịch sử trò chuyện:', error);
+    }
+  }, [chatSessions]);
+
+  useEffect(() => {
+    const firstUserMessage = chatMessages.find((message) => message.role === 'user');
+    if (!activeChatId || !firstUserMessage) return;
+    setChatSessions((current) => {
+      const existing = current.find((item) => item.id === activeChatId);
+      const updated: ChatSession = {
+        id: activeChatId,
+        createdAt: existing?.createdAt || Date.now(),
+        updatedAt: Date.now(),
+        title: firstUserMessage.content.replace(/\s+/g, ' ').trim().slice(0, 52),
+        supportMode,
+        messages: chatMessages.slice(-60)
+      };
+      return [updated, ...current.filter((item) => item.id !== activeChatId)].slice(0, 20);
+    });
+  }, [activeChatId, chatMessages, supportMode]);
+
   const handleSaveBrowserApiKey = (key: string) => {
     const cleanKey = key.trim();
     setBrowserApiKey(cleanKey);
@@ -89,8 +125,10 @@ export const App: React.FC = () => {
   const handleClearAllData = () => {
     localStorage.removeItem(STORAGE_KEY_DRAFTS);
     localStorage.removeItem(STORAGE_KEY_REDUCED_MOTION);
+    localStorage.removeItem(STORAGE_KEY_CHAT_SESSIONS);
     sessionStorage.removeItem(STORAGE_KEY_BROWSER_API_KEY);
     setDrafts([]);
+    setChatSessions([]);
     setBrowserApiKey('');
     setReducedMotion(false);
     handleEmergencyExit();
@@ -151,10 +189,31 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleStartNewChat = () => {
+    chatController.current?.abort();
+    setActiveChatId(`chat_${Date.now()}_${Math.random().toString(36).slice(2)}`);
+    setChatMessages([]);
+    setSupportMode('understand');
+    setIsChatTyping(false);
+    setChatError(null);
+    setCurrentScreen('screen-chat-start');
+  };
+
+  const handleOpenChat = (chat: ChatSession) => {
+    chatController.current?.abort();
+    setActiveChatId(chat.id);
+    setChatMessages(chat.messages);
+    setSupportMode(chat.supportMode);
+    setIsChatTyping(false);
+    setChatError(null);
+    setCurrentScreen('screen-chat-conversation');
+  };
+
   // Thoát khẩn cấp và xóa sạch bộ nhớ phiên hiện tại
   const handleEmergencyExit = () => {
     analysisController.current?.abort();
     chatController.current?.abort();
+    setActiveChatId(null);
     setChatMessages([]);
     setIsChatTyping(false);
     setSession({
@@ -169,7 +228,7 @@ export const App: React.FC = () => {
       isSavedAsDraft: false,
       isAnalyzedWithAI: false
     });
-    setCurrentScreen('screen-chat-start');
+    setCurrentScreen('screen-chat-home');
   };
 
   // Kích hoạt màn hình an toàn
@@ -264,8 +323,9 @@ export const App: React.FC = () => {
 
   const getPreviousScreen = (): Screen | null => {
     switch (currentScreen) {
-      case 'screen-chat-start': return 'screen-0-splash';
-      case 'screen-chat-conversation': return 'screen-chat-start';
+      case 'screen-chat-home': return 'screen-0-splash';
+      case 'screen-chat-start': return 'screen-chat-home';
+      case 'screen-chat-conversation': return 'screen-chat-home';
       case 'screen-1-intro': return 'screen-chat-start';
       case 'screen-2-checkin': return 'screen-1-intro';
       case 'screen-3-vent': return 'screen-2-checkin';
@@ -305,7 +365,15 @@ export const App: React.FC = () => {
           </div>
         )}
         {currentScreen === 'screen-0-splash' && (
-          <Screen0Splash onProceed={() => setCurrentScreen('screen-chat-start')} />
+          <Screen0Splash onProceed={() => setCurrentScreen('screen-chat-home')} />
+        )}
+
+        {currentScreen === 'screen-chat-home' && (
+          <ScreenChatHome
+            sessions={chatSessions}
+            onNewChat={handleStartNewChat}
+            onOpenChat={handleOpenChat}
+          />
         )}
 
         {currentScreen === 'screen-chat-start' && (
