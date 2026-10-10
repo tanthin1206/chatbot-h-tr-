@@ -49,7 +49,7 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+    <div className="max-w-3xl mx-auto px-3 sm:px-4 pt-4 pb-32 space-y-4">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="font-bold text-slate-900">Trò chuyện cùng Mây</h1>
@@ -125,7 +125,7 @@ export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
         </div>
       )}
 
-      <div className="sticky bottom-3 z-30 -mx-1 sm:mx-0 bg-[#FAF8F5]/90 backdrop-blur-md border border-stone-200 rounded-2xl p-2 shadow-lg shadow-slate-900/10 flex items-end gap-2" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
+      <div className="fixed bottom-3 left-1/2 z-50 flex w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 items-end gap-2 rounded-2xl border border-stone-200 bg-[#FAF8F5]/95 p-2 shadow-xl shadow-slate-900/15 backdrop-blur-md" style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}>
         <textarea
           value={text}
           onChange={(event) => setText(event.target.value)}
