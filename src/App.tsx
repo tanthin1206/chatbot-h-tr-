@@ -315,7 +315,7 @@ export const App: React.FC = () => {
       case 'screen-chat-home': return 'screen-0-splash';
       case 'screen-chat-start': return 'screen-chat-home';
       case 'screen-chat-conversation': return 'screen-chat-home';
-      case 'screen-1-intro': return 'screen-chat-start';
+      case 'screen-1-intro': return 'screen-chat-home';
       case 'screen-2-checkin': return 'screen-1-intro';
       case 'screen-3-vent': return 'screen-2-checkin';
       case 'screen-4-confirm': return 'screen-3-vent';
@@ -361,6 +361,7 @@ export const App: React.FC = () => {
           <ScreenChatHome
             sessions={chatSessions}
             onNewChat={handleStartNewChat}
+            onPrivateWrite={() => setCurrentScreen('screen-1-intro')}
             onOpenChat={handleOpenChat}
           />
         )}

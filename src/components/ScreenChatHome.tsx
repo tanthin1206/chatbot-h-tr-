@@ -1,10 +1,11 @@
 import React from 'react';
-import { ChevronRight, Clock3, MessageCircleHeart, Plus, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Clock3, MessageCircleHeart, PenLine, Plus, ShieldCheck } from 'lucide-react';
 import { ChatSession } from '../types';
 
 interface ScreenChatHomeProps {
   sessions: ChatSession[];
   onNewChat: () => void;
+  onPrivateWrite: () => void;
   onOpenChat: (session: ChatSession) => void;
 }
 
@@ -21,7 +22,7 @@ const formatTime = (timestamp: number) => new Intl.DateTimeFormat('vi-VN', {
   minute: '2-digit'
 }).format(timestamp);
 
-export const ScreenChatHome: React.FC<ScreenChatHomeProps> = ({ sessions, onNewChat, onOpenChat }) => (
+export const ScreenChatHome: React.FC<ScreenChatHomeProps> = ({ sessions, onNewChat, onPrivateWrite, onOpenChat }) => (
   <div className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
     <div className="grid items-start gap-8 md:grid-cols-[1fr_210px]">
       <div className="space-y-7">
@@ -30,21 +31,36 @@ export const ScreenChatHome: React.FC<ScreenChatHomeProps> = ({ sessions, onNewC
             <MessageCircleHeart className="h-3.5 w-3.5" /> Góc trò chuyện của bạn
           </span>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Mây vẫn ở đây khi bạn muốn kể</h1>
-          <p className="max-w-xl text-sm leading-relaxed text-slate-600">Mỗi lần bắt đầu là một khoảng riêng. Bạn có thể mở lại chuyện cũ hoặc tạo một cuộc trò chuyện mới.</p>
+          <p className="max-w-xl text-sm leading-relaxed text-slate-600">Bạn có thể trò chuyện cùng Mây, hoặc chỉ viết ra rồi nhờ Mây giúp nhìn lại theo cách nhẹ nhàng hơn.</p>
         </div>
 
-        <button
-          type="button"
-          onClick={onNewChat}
-          className="group flex w-full items-center gap-3 rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-50 to-purple-50 p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
-        >
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm"><Plus className="h-5 w-5" /></span>
-          <span className="flex-1">
-            <strong className="block text-base text-slate-900">Chat với Mây</strong>
-            <span className="mt-0.5 block text-xs text-slate-500">Bắt đầu một cuộc trò chuyện mới</span>
-          </span>
-          <ChevronRight className="h-5 w-5 text-blue-500 transition-transform group-hover:translate-x-1" />
-        </button>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={onNewChat}
+            className="group flex min-h-28 w-full items-center gap-3 rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-purple-50 p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm"><Plus className="h-5 w-5" /></span>
+            <span className="min-w-0 flex-1">
+              <strong className="block text-base text-slate-900">Chat với Mây</strong>
+              <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">Bắt đầu một cuộc trò chuyện mới</span>
+            </span>
+            <ChevronRight className="h-5 w-5 shrink-0 text-blue-500 transition-transform group-hover:translate-x-1" />
+          </button>
+
+          <button
+            type="button"
+            onClick={onPrivateWrite}
+            className="group flex min-h-28 w-full items-center gap-3 rounded-3xl border border-purple-200 bg-gradient-to-br from-purple-50 to-rose-50 p-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-purple-300 hover:shadow-md"
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-purple-600 text-white shadow-sm"><PenLine className="h-5 w-5" /></span>
+            <span className="min-w-0 flex-1">
+              <strong className="block text-base text-slate-900">Chỉ muốn viết</strong>
+              <span className="mt-0.5 block text-xs leading-relaxed text-slate-500">Viết riêng, nhìn lại và nhận gợi ý</span>
+            </span>
+            <ChevronRight className="h-5 w-5 shrink-0 text-purple-500 transition-transform group-hover:translate-x-1" />
+          </button>
+        </div>
 
         <section className="space-y-3" aria-labelledby="chat-history-title">
           <div className="flex items-end justify-between gap-3">
