@@ -1,0 +1,159 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowUp, CheckCircle2, FileHeart, HeartHandshake, Lightbulb, MessageCircle, MessagesSquare, ShieldAlert, Sparkles } from 'lucide-react';
+import { ChatMessage, SupportMode } from '../types';
+
+interface ScreenChatConversationProps {
+  messages: ChatMessage[];
+  supportMode: SupportMode;
+  isTyping: boolean;
+  onModeChange: (mode: SupportMode) => void;
+  onSend: (text: string) => void;
+  onFinish: () => void;
+  onOpenSafety: () => void;
+}
+
+const MODES: Array<{ id: SupportMode; label: string; icon: React.ElementType }> = [
+  { id: 'listen', label: 'Chỉ lắng nghe', icon: HeartHandshake },
+  { id: 'understand', label: 'Giúp mình hiểu', icon: Sparkles },
+  { id: 'advice', label: 'Cho lời khuyên', icon: Lightbulb },
+  { id: 'prepare', label: 'Giúp mình nói', icon: MessagesSquare },
+  { id: 'calm', label: 'Bình tĩnh trước', icon: MessageCircle }
+];
+
+export const ScreenChatConversation: React.FC<ScreenChatConversationProps> = ({
+  messages,
+  supportMode,
+  isTyping,
+  onModeChange,
+  onSend,
+  onFinish,
+  onOpenSafety
+}) => {
+  const [text, setText] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const lastAssistant = [...messages].reverse().find((message) => message.role === 'assistant');
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, isTyping]);
+
+  const send = (value = text) => {
+    const clean = value.trim();
+    if (!clean || isTyping) return;
+    onSend(clean);
+    setText('');
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto px-3 sm:px-4 py-4 space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h1 className="font-bold text-slate-900">Trò chuyện cùng Mây</h1>
+          <p className="text-xs text-slate-500">Bạn có thể đổi cách Mây hỗ trợ bất cứ lúc nào.</p>
+        </div>
+        <button onClick={onFinish} disabled={messages.filter((message) => message.role === 'user').length < 1 || isTyping} className="px-3 py-2 rounded-xl border border-blue-200 bg-blue-50 text-xs font-semibold text-blue-800 hover:bg-blue-100 disabled:opacity-40 inline-flex items-center gap-1.5">
+          <FileHeart className="w-4 h-4" /> Gom lại điều mình vừa kể
+        </button>
+      </div>
+
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {MODES.map(({ id, label, icon: Icon }) => (
+          <button key={id} onClick={() => onModeChange(id)} className={`shrink-0 px-3 py-2 rounded-xl border text-xs font-medium inline-flex items-center gap-1.5 ${supportMode === id ? 'bg-slate-900 border-slate-900 text-white' : 'bg-white border-stone-200 text-slate-600 hover:border-blue-300'}`}>
+            <Icon className="w-3.5 h-3.5" /> {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="min-h-[52vh] rounded-3xl border border-stone-200 bg-white/70 p-3 sm:p-5 space-y-4">
+        <div className="flex gap-3 items-start">
+          <img src="/illustrations/cloud-breathe.png" alt="Mây" className="w-10 h-10 object-contain shrink-0 mascot-listen" />
+          <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-blue-50 border border-blue-100 p-3 text-sm text-slate-700 message-pop">
+            Chào bạn, mình là Mây. Mình sẽ lắng nghe trước. Bạn không cần kể mọi thứ ngay một lần.
+          </div>
+        </div>
+
+        {messages.map((message) => (
+          <div key={message.id} className={`flex gap-3 items-start message-pop ${message.role === 'user' ? 'justify-end' : ''}`}>
+            {message.role === 'assistant' && <img src="/illustrations/cloud-breathe.png" alt="Mây" className="w-10 h-10 object-contain shrink-0 mascot-listen" />}
+            <div className={`max-w-[88%] sm:max-w-[78%] space-y-2 ${message.role === 'user' ? 'items-end' : ''}`}>
+              <div className={`rounded-2xl p-3 sm:p-3.5 text-sm leading-relaxed ${message.role === 'user' ? 'rounded-tr-md bg-slate-800 text-white' : 'rounded-tl-md bg-blue-50 border border-blue-100 text-slate-700'}`}>
+                {message.response ? (
+                  <div className="space-y-2">
+                    <p>{message.response.acknowledgement}</p>
+                    {message.response.reflection && <p className="font-medium text-slate-800">{message.response.reflection}</p>}
+                    {message.response.question && <p className="text-blue-800">{message.response.question}</p>}
+                  </div>
+                ) : message.content}
+              </div>
+
+              {message.response?.advice.map((advice) => (
+                <div key={advice.title} className="rounded-2xl border border-purple-100 bg-purple-50/60 p-3 text-xs text-slate-700 space-y-1.5">
+                  <strong className="text-sm text-purple-950 flex items-center gap-1.5"><Lightbulb className="w-4 h-4" /> {advice.title}</strong>
+                  <p>{advice.explanation}</p>
+                  <p className="font-medium text-blue-800 flex gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 shrink-0 mt-0.5" /> Bước đầu: {advice.firstStep}</p>
+                  {advice.caution && <p className="text-amber-800">Lưu ý: {advice.caution}</p>}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {isTyping && (
+          <div className="flex gap-3 items-center">
+            <img src="/illustrations/cloud-breathe.png" alt="Mây đang suy nghĩ" className="w-10 h-10 object-contain mascot-think" />
+            <div className="rounded-2xl rounded-tl-md bg-blue-50 border border-blue-100 px-4 py-3 flex gap-1">
+              {[0, 1, 2].map((item) => <span key={item} className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: `${item * 120}ms` }} />)}
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+
+      {!isTyping && lastAssistant?.response?.quickReplies && lastAssistant === messages[messages.length - 1] && (
+        <div className="flex flex-wrap gap-2">
+          {lastAssistant.response.quickReplies.map((reply) => (
+            <button key={reply} onClick={() => send(reply)} className="px-3 py-2 rounded-full border border-blue-200 bg-blue-50 text-xs text-blue-800 hover:bg-blue-100 interactive-card">{reply}</button>
+          ))}
+        </div>
+      )}
+
+      {messages.some((message) => message.role === 'user') && !isTyping && (
+        <div className="rounded-2xl border border-emerald-100 bg-emerald-50/70 p-4 flex flex-col sm:flex-row sm:items-center gap-3 soft-pop">
+          <img src="/illustrations/cloud-untangle.png" alt="Mây đang gom lại câu chuyện" className="w-16 h-16 object-contain shrink-0 mascot-float" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-emerald-950">Khi bạn đã kể đủ cho lúc này</p>
+            <p className="text-xs text-emerald-800/80 mt-0.5">Mây sẽ dùng chính điều bạn vừa kể để tìm điểm quan trọng, nhu cầu của bạn và một bước nhỏ phù hợp.</p>
+          </div>
+          <button onClick={onFinish} className="shrink-0 px-4 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold inline-flex items-center justify-center gap-1.5">
+            Sang bước Nhìn lại <FileHeart className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      <div className="bg-white border border-stone-200 rounded-2xl p-2 shadow-sm flex items-end gap-2">
+        <textarea
+          value={text}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              send();
+            }
+          }}
+          disabled={isTyping}
+          maxLength={2000}
+          rows={2}
+          placeholder="Bạn muốn kể thêm điều gì?"
+          className="flex-1 resize-none bg-transparent px-2 py-2 text-sm focus:outline-none disabled:opacity-60"
+        />
+        <button onClick={() => send()} disabled={!text.trim() || isTyping} aria-label="Gửi tin nhắn" className="w-10 h-10 rounded-xl bg-blue-600 disabled:bg-stone-200 text-white flex items-center justify-center shrink-0">
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="text-center">
+        <button onClick={onOpenSafety} className="text-[11px] text-rose-600 hover:underline inline-flex items-center gap-1"><ShieldAlert className="w-3.5 h-3.5" /> Mình đang không an toàn</button>
+      </div>
+    </div>
+  );
+};
