@@ -69,7 +69,7 @@ app.post('/api/chat', async (request, response) => {
       ...message,
       content: message.role === 'user' ? redactPersonalData(message.content) : message.content
     }));
-    const geminiResponse = await ai.models.generateContent({
+    const geminiResponse = await generateChatWithRetry({
       model,
       contents: buildChatPrompt({ messages, supportMode: input.supportMode, riskLevel: risk.level }),
       config: {
@@ -92,6 +92,21 @@ app.post('/api/chat', async (request, response) => {
     return response.status(status).json({ error: 'chat_failed' });
   }
 });
+
+async function generateChatWithRetry(request) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await ai.models.generateContent(request);
+    } catch (error) {
+      lastError = error;
+      const status = typeof error === 'object' && error && 'status' in error ? Number(error.status) : NaN;
+      if (![500, 503].includes(status) || attempt === 2) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 350 * (attempt + 1)));
+    }
+  }
+  throw lastError;
+}
 
 function parseGeminiJson(text) {
   const trimmed = text.trim();
